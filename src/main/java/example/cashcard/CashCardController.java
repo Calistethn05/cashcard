@@ -1,14 +1,17 @@
 package example.cashcard;
 
+import java.net.URI;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/cashcards")
@@ -17,6 +20,11 @@ public class CashCardController {
 
     public CashCardController(CashCardRepository cashCardRepository) {
         this.cashCardRepository = cashCardRepository;
+    }
+
+    @GetMapping()
+    public ResponseEntity<Iterable<CashCard>> findAll() {
+        return ResponseEntity.ok(cashCardRepository.findAll());
     }
 
     @GetMapping("/{requestedId}")
@@ -30,8 +38,13 @@ public class CashCardController {
     }
 
     @PostMapping
-    private ResponseEntity createCashCard() {
-        return null;
+    private ResponseEntity<Void> createCashCard(@RequestBody CashCard newCashCardRequest, UriComponentsBuilder ucb) {
+        CashCard savedCashCard = cashCardRepository.save(newCashCardRequest);
+        URI locationOfNewCashCard = ucb
+            .path("cashcards/{id}")
+            .buildAndExpand(savedCashCard.getId())
+            .toUri();
+        return ResponseEntity.created(locationOfNewCashCard).build();
     }
 
 }

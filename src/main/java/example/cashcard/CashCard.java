@@ -1,5 +1,8 @@
 package example.cashcard;
 
+
+import java.util.function.IntPredicate;
+
 // import org.springframework.data.annotation.Id;
 
 import jakarta.persistence.Entity;
